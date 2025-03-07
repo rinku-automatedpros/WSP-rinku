@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import { FullscreenIcon } from "@/icons"
-import { fontButtonSmall, fontHeadline, fontTitle1 } from '@/styles/typography'
+import { fontButtonSmall, fontHeadline, fontTitle1, fontBodyBold } from '@/styles/typography'
 
 export default function OrderStatus() {
   const [currentTime, setCurrentTime] = useState('')
@@ -18,10 +18,10 @@ export default function OrderStatus() {
   useEffect(() => {
     const updateTime = () => {
       const now = new Date()
-      setCurrentTime(now.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
+      setCurrentTime(now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
         minute: '2-digit',
-        hour12: false 
+        hour12: false
       }))
     }
     updateTime()
@@ -41,20 +41,11 @@ export default function OrderStatus() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col lg:flex-row">
-      <div className="w-full pl-4">
-        <div className="flex flex-col lg:flex-row items-center justify-between py-6 pr-4">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-[60px] w-[60px] rounded-full">
-              <AvatarImage
-                src="/mcdonalds-logo.png"
-                className="h-auto w-full max-w-[100px] rounded-full"
-              />
-            </Avatar>
-            <h3 className={cn(fontHeadline)}>McDonald&apos;s</h3>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className={cn(fontTitle1, "text-black-100")}>{currentTime}</span>
+
+    <div className="flex min-h-screen flex-col px-4">
+      <div className="flex items-center justify-between px-4 pt-7">
+            <h1 className={cn("font-medium", fontTitle1)}>Order Status</h1>
+            <div className="flex gap-2">
             <button
               onClick={toggleFullScreen}
               className={cn(
@@ -64,6 +55,21 @@ export default function OrderStatus() {
             >
               <FullscreenIcon /> FullScreen
             </button>
+            </div>
+        </div>
+      <div className="w-full pl-4">
+        <div className="flex flex-col lg:flex-row items-center justify-between py-3 pr-3 rounded-5 bg-black-5 my-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-[60px] w-[60px] rounded-full">
+              <AvatarImage
+                src="/mcdonalds-logo.png"
+                className="h-auto w-full max-w-[100px] rounded-full"
+              />
+            </Avatar>
+            <h3 className={cn(fontHeadline)}>McDonald's</h3>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className={cn(fontTitle1, "text-black-100")}>{currentTime}</span>
           </div>
         </div>
 
@@ -71,13 +77,13 @@ export default function OrderStatus() {
           {/* Preparing Section */}
           <div className="rounded-xl bg-white p-6 shadow-md">
             <h2 className="mb-6 text-2xl font-bold text-center">Preparing</h2>
-            <div className="grid grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {preparingOrders.map((order, index) => (
                 <div
                   key={index}
                   className="rounded-lg bg-gray-200 px-4 py-2 text-center font-medium"
                 >
-                  {order}
+                  <span className={cn("text-black-100", fontBodyBold)}>{order}</span>
                 </div>
               ))}
             </div>
@@ -104,6 +110,6 @@ export default function OrderStatus() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
