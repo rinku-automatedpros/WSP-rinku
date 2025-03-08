@@ -6,6 +6,7 @@ import { Grid2X2, GridIcon } from "lucide-react"
 import { TableCard } from "@/components/liveCounterTableCard"
 import SearchInput from "@/components/searchInput"
 import { CustomSelect } from "@/components/select"
+import AddIcon from "@/icons/AddIcon"
 
 
 // Mock data types
@@ -63,6 +64,7 @@ export default function LiveCounter() {
   const [showGridOptions, setShowGridOptions] = useState(false)
   const [badgeNumbers, setBadgeNumbers] = useState<Record<string, number>>({})
   const [mockData, setMockData] = useState<ReturnType<typeof generateMockData>>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     // Generate random numbers and mock data once on mount
@@ -182,6 +184,14 @@ export default function LiveCounter() {
           </div>
         </div>
       </div>
+
+      {/* Floating Action Button */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="fixed bottom-4 right-4 p-5 rounded-full bg-white shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <AddIcon className="w-6 h-6" />
+      </button>
     </div>
   )
 } 
