@@ -66,7 +66,7 @@ export default function OrderStatus() {
                 className="h-auto w-full max-w-[100px] rounded-full"
               />
             </Avatar>
-            <h3 className={cn(fontHeadline)}>McDonald's</h3>
+            <h3 className={cn(fontHeadline)}>McDonald&apos;s</h3>
           </div>
           <div className="flex items-center gap-4">
             <span className={cn(fontTitle1, "text-black-100")}>{currentTime}</span>
