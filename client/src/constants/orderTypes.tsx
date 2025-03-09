@@ -1,5 +1,5 @@
 export enum OrderType {
-  ALL = "",
+  ALL = "all",
   DELIVERY = "delivery",
   PICKUP = "pickup",
   DINE = "dine_in",
