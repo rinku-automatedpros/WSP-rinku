@@ -6,12 +6,19 @@ import { MenuItem } from "@/components/menuItem"
 
 interface MenuSectionProps {
   selectedMenu: string | null
-  handleMenuSelect: (menuId: string) => void // Passed from the parent for flexibility
+  handleMenuSelect: (menuId: string) => void
+  _dummyData?: Array<{
+    menu_id: string
+    menu_name: string
+    active_items_count: number
+    inactive_items_count: number
+  }>
 }
 
 export function MenuSection({
   selectedMenu,
   handleMenuSelect,
+  _dummyData,
 }: MenuSectionProps) {
   const { brandId } = useAuth()
 
@@ -26,20 +33,38 @@ export function MenuSection({
     search: "",
   })
 
-  const menus = menusData?.pages.flatMap((page) => page.data) || []
+  // Use dummy data if provided, otherwise use fetched data
+  const menus = _dummyData 
+    ? _dummyData.map(menu => ({
+        id: menu.menu_id,
+        name: menu.menu_name,
+        active_items_count: menu.active_items_count,
+        inactive_items_count: menu.inactive_items_count
+      }))
+    : menusData?.pages.flatMap((page) => page.data) || []
+
   const scrollRef = useRef<HTMLDivElement | null>(null)
-  const endRef = useRef<HTMLDivElement | null>(null) // Marker for observer
+  const endRef = useRef<HTMLDivElement | null>(null)
 
   const handleWheel = (
     ref: React.RefObject<HTMLDivElement>,
     e: React.WheelEvent
   ) => {
     if (ref.current) {
-      ref.current.scrollLeft += e.deltaY // Horizontal scrolling
+      ref.current.scrollLeft += e.deltaY
     }
   }
 
   useEffect(() => {
+    if (menus.length > 0 && !selectedMenu) {
+      handleMenuSelect(menus[0].id)
+    }
+  }, [menus, selectedMenu, handleMenuSelect])
+
+  // Only set up intersection observer if we're not using dummy data
+  useEffect(() => {
+    if (_dummyData) return // Skip if using dummy data
+
     const currentEndRef = endRef.current
 
     if (!currentEndRef) return
@@ -51,9 +76,9 @@ export function MenuSection({
         }
       },
       {
-        root: scrollRef.current, // Horizontal scrolling container
-        rootMargin: "0px 100px", // Extend detection on the right
-        threshold: 0.1, // Trigger when 10% of the marker is visible
+        root: scrollRef.current,
+        rootMargin: "0px 100px",
+        threshold: 0.1,
       }
     )
 
@@ -62,13 +87,7 @@ export function MenuSection({
     return () => {
       observer.disconnect()
     }
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
-
-  useEffect(() => {
-    if (menus.length > 0 && !selectedMenu) {
-      handleMenuSelect(menus[0].id) // Select the first menu
-    }
-  }, [menus, selectedMenu, handleMenuSelect])
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, _dummyData])
 
   return (
     <div
@@ -90,9 +109,10 @@ export function MenuSection({
             </p>
           </MenuItem>
         ))}
-        {/* Intersection Observer Marker */}
-        <div ref={endRef} className="w-1" />
+        {/* Only show marker for IntersectionObserver when not using dummy data */}
+        {!_dummyData && <div ref={endRef} className="w-1" />}
       </div>
     </div>
   )
 }
+

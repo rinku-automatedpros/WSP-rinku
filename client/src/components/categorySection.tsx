@@ -13,18 +13,26 @@ interface CategoryManagementSectionProps {
     categoryDetails?: CategoryDetails
   ) => void
   menuId: string | null
-  updateCategoryDetails?: boolean // New prop to control if details should be updated
+  updateCategoryDetails?: boolean
   categoryStatus: CategoryStatus
-  showBothCounts?: boolean // New flag
+  showBothCounts?: boolean
+  _dummyData?: Array<{
+    category_id: string
+    category_name: string
+    active_items_count: number
+    inactive_items_count: number
+    status: string
+  }>
 }
 
 export function CategoryManagementSection({
   selectedCategory,
   handleCategorySelect,
   menuId,
-  updateCategoryDetails = false, // Default is false for flexibility
+  updateCategoryDetails = false,
   categoryStatus,
   showBothCounts,
+  _dummyData,
 }: CategoryManagementSectionProps) {
   const { brandId } = useAuth()
 
@@ -41,22 +49,22 @@ export function CategoryManagementSection({
     status: categoryStatus,
   })
 
-  const categories = categoriesData?.pages.flatMap((page) => page.data) || []
+  // Use dummy data if provided, otherwise use fetched data
+  const categories = _dummyData || categoriesData?.pages.flatMap((page) => page.data) || []
   const scrollRef = useRef<HTMLDivElement | null>(null)
-  const endRef = useRef<HTMLDivElement | null>(null) // Marker for the end
+  const endRef = useRef<HTMLDivElement | null>(null)
 
   const handleWheel = (
     ref: React.RefObject<HTMLDivElement>,
     e: React.WheelEvent
   ) => {
     if (ref.current) {
-      ref.current.scrollLeft += e.deltaY // Horizontal scrolling
+      ref.current.scrollLeft += e.deltaY
     }
   }
 
   useEffect(() => {
     if (categories.length > 0 && !selectedCategory) {
-      // Find the first category that matches the filter criteria
       const firstValidCategory = categories.find((category) =>
         showBothCounts
           ? category.active_items_count > 0 || category.inactive_items_count > 0
@@ -65,7 +73,6 @@ export function CategoryManagementSection({
 
       if (firstValidCategory) {
         if (updateCategoryDetails) {
-          // Pass CategoryDetails if `updateCategoryDetails` is true
           handleCategorySelect(firstValidCategory.category_id, {
             name: firstValidCategory.category_name,
             itemsCount: showBothCounts
@@ -87,7 +94,10 @@ export function CategoryManagementSection({
     updateCategoryDetails,
   ])
 
+  // Only set up intersection observer if we're not using dummy data
   useEffect(() => {
+    if (_dummyData) return // Skip if using dummy data
+
     const currentEndRef = endRef.current
 
     if (!currentEndRef) return
@@ -99,9 +109,9 @@ export function CategoryManagementSection({
         }
       },
       {
-        root: scrollRef.current, // The horizontally scrollable container
-        rootMargin: "0px 100px", // Detect near the right edge
-        threshold: 0.1, // Trigger when 10% of the marker is visible
+        root: scrollRef.current,
+        rootMargin: "0px 100px",
+        threshold: 0.1,
       }
     )
 
@@ -110,7 +120,7 @@ export function CategoryManagementSection({
     return () => {
       observer.disconnect()
     }
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, _dummyData])
 
   return (
     <div
@@ -157,8 +167,8 @@ export function CategoryManagementSection({
           </Tab>
         ))}
 
-      {/* Marker for IntersectionObserver */}
-      <div ref={endRef} className="w-1" />
+      {/* Only show marker for IntersectionObserver when not using dummy data */}
+      {!_dummyData && <div ref={endRef} className="w-1" />}
     </div>
   )
 }
